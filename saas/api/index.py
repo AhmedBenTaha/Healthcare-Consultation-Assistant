@@ -1,5 +1,7 @@
 
 import os
+import json
+
 from fastapi import FastAPI, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -80,19 +82,23 @@ def consultation_summary(
     )
 
     def event_stream():
-        for chunk in stream:
-            text = chunk.choices[0].delta.content
+        try:
+            for chunk in stream:
+                text = chunk.choices[0].delta.content
 
-            if text:
-                lines = text.split("\n")
+                if text:
+                    # Preserve the exact text, spaces, and Markdown.
+                    # JSON encoding safely handles newlines and special characters.
+                    yield f"data: {json.dumps(text, ensure_ascii=False)}\n\n"
 
-                for line in lines[:-1]:
-                    yield f"data: {line}\n\n"
-                    yield "data:  \n"
-
-                yield f"data: {lines[-1]}\n\n"
+        finally:
+            stream.close()
 
     return StreamingResponse(
         event_stream(),
         media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
     )

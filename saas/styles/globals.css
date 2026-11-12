@@ -1,86 +1,361 @@
+
 @import "tailwindcss";
 
+/* =========================================
+   1. CLINOVA THEME VARIABLES
+========================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #07111f;
+  --foreground: #f1f5f9;
+
+  --primary: #14b8a6;
+  --primary-light: #5eead4;
+  --secondary: #06b6d4;
+
+  --surface: #0f1d2e;
+  --border: rgba(255, 255, 255, 0.1);
+
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =========================================
+   2. GLOBAL STYLES
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer base {
-  .markdown-content h1 {
-    font-size: 2em;
-    font-weight: bold;
-    margin: 0.67em 0;
+::selection {
+  background: rgba(20, 184, 166, 0.35);
+  color: white;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+/* =========================================
+   3. CUSTOM SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #07111f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #263b4d;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #14b8a6;
+}
+
+/* =========================================
+   4. ANIMATIONS
+========================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-  .markdown-content h2 {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin: 0.83em 0;
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .markdown-content h3 {
-    font-size: 1.17em;
-    font-weight: bold;
-    margin: 1em 0;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  .markdown-content h4 {
-    font-size: 1em;
-    font-weight: bold;
-    margin: 1.33em 0;
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .markdown-content h5 {
-    font-size: 0.83em;
-    font-weight: bold;
-    margin: 1.67em 0;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.1);
   }
-  .markdown-content h6 {
-    font-size: 0.67em;
-    font-weight: bold;
-    margin: 2.33em 0;
+
+  50% {
+    box-shadow: 0 0 25px rgba(20, 184, 166, 0.3);
   }
-  .markdown-content p {
-    margin: 1em 0;
-  }
-  .markdown-content ul {
-    list-style-type: disc;
-    padding-left: 2em;
-    margin: 1em 0;
-  }
-  .markdown-content ol {
-    list-style-type: decimal;
-    padding-left: 2em;
-    margin: 1em 0;
-  }
-  .markdown-content li {
-    margin: 0.25em 0;
-  }
-  .markdown-content strong {
-    font-weight: bold;
-  }
-  .markdown-content em {
-    font-style: italic;
-  }
-  .markdown-content hr {
-    border: 0;
-    border-top: 1px solid #e5e7eb;
-    margin: 2em 0;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out both;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+/* =========================================
+   5. FORM ELEMENTS
+========================================= */
+
+input,
+textarea {
+  color-scheme: dark;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* =========================================
+   6. DATE PICKER
+========================================= */
+
+.react-datepicker-wrapper {
+  display: block;
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  display: block;
+}
+
+.react-datepicker {
+  background: #0f1d2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  color: #f1f5f9 !important;
+  font-family: inherit !important;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.react-datepicker__header {
+  background: #142438 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: #e2e8f0 !important;
+}
+
+.react-datepicker__day {
+  color: #cbd5e1 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.react-datepicker__day:hover {
+  background: rgba(20, 184, 166, 0.2) !important;
+  color: #5eead4 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: #14b8a6 !important;
+  color: #07111f !important;
+  font-weight: 700;
+}
+
+.react-datepicker__day--outside-month {
+  color: #475569 !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #94a3b8 !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+/* =========================================
+   7. MARKDOWN / AI REPORT
+========================================= */
+
+.prose {
+  color: #cbd5e1;
+  line-height: 1.8;
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: #99f6e4;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose h1 {
+  font-size: 1.8rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+}
+
+.prose h3 {
+  font-size: 1.2rem;
+}
+
+.prose p {
+  margin: 1em 0;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin: 1em 0;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li {
+  margin: 0.4em 0;
+  padding-left: 0.25rem;
+}
+
+.prose strong {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.prose em {
+  color: #99f6e4;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 2rem 0;
+}
+
+.prose a {
+  color: #67e8f9;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose blockquote {
+  border-left: 3px solid #14b8a6;
+  background: rgba(20, 184, 166, 0.06);
+  padding: 0.75rem 1rem;
+  border-radius: 0 10px 10px 0;
+  color: #cbd5e1;
+}
+
+.prose code {
+  color: #5eead4;
+  background: rgba(20, 184, 166, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 5px;
+}
+
+.prose pre {
+  background: #0b1726;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  color: #cbd5e1;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.prose th {
+  color: #99f6e4;
+  background: rgba(20, 184, 166, 0.08);
+}
+
+/* =========================================
+   8. ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
