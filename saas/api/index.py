@@ -1,21 +1,64 @@
+
 import os
 from fastapi import FastAPI, Depends
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from fastapi_clerk_auth import (
     ClerkConfig,
     ClerkHTTPBearer,
     HTTPAuthorizationCredentials,
 )
 from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
-clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
+clerk_config = ClerkConfig(
+    jwks_url=os.getenv("CLERK_JWKS_URL")
+)
 clerk_guard = ClerkHTTPBearer(clerk_config)
 
 
-@app.get("/api")
-def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
+class Visit(BaseModel):
+    patient_name: str
+    date_of_visit: str
+    notes: str
+
+
+system_prompt = """
+You are provided with notes written by a doctor from a patient's visit.
+
+Your job is to summarize the visit for the doctor and provide an email.
+
+Do not invent medical information, diagnoses, medications, or recommendations.
+If information is missing, explicitly state that it was not provided.
+The doctor must review all generated content before using it.
+
+Reply with exactly three sections with the headings:
+
+### Summary of visit for the doctor's records
+### Next steps for the doctor
+### Draft of email to patient in patient-friendly language
+"""
+
+
+def user_prompt_for(visit: Visit) -> str:
+    return f"""Create the summary, next steps and draft email for:
+
+Patient Name: {visit.patient_name}
+Date of Visit: {visit.date_of_visit}
+
+Notes:
+{visit.notes}"""
+
+
+@app.post("/api")
+def consultation_summary(
+    visit: Visit,
+    creds: HTTPAuthorizationCredentials = Depends(clerk_guard),
+):
     user_id = creds.decoded["sub"]
 
     client = OpenAI(
@@ -23,18 +66,15 @@ def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
         base_url="https://api.groq.com/openai/v1",
     )
 
+    user_prompt = user_prompt_for(visit)
+
     prompt = [
-        {
-            "role": "user",
-            "content": (
-                "Reply with a new business idea for AI Agents, "
-                "formatted with headings, sub-headings and bullet points"
-            ),
-        }
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
     stream = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
+        model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         messages=prompt,
         stream=True,
     )
